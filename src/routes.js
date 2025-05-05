@@ -3,6 +3,9 @@ import alunoController from "./controllers/alunoController.js";
 import livroController from "./controllers/livroController.js";
 import funcionarioController from "./controllers/funcionarioController.js";
 import emprestimoController from "./controllers/emprestimoController.js";
+import autorController from "./controllers/autorController.js";
+import turmaController from "./controllers/turmaController.js";
+import categoriaController from "./controllers/categoriaController.js";
 
 const router = Router();
 
@@ -34,5 +37,23 @@ router.post("/emprestimos", emprestimoController.Inserir);
 router.get("/emprestimos", emprestimoController.Listar);
 router.put("/emprestimos/:id", emprestimoController.Editar);
 router.delete("/emprestimos/:id", emprestimoController.Excluir);
+
+// Rotas para autores
+router.post("/autores", autorController.Inserir);
+router.get("/autores", autorController.Listar);
+router.put("/autores/:id", autorController.Editar);  // Atualizar autor
+router.delete("/autores/:id", autorController.Excluir);  // Excluir autor
+
+// Rotas para turmas
+router.post("/turmas", turmaController.Inserir);
+router.get("/turmas", turmaController.Listar);
+router.put("/turmas/:id", turmaController.Editar);  // Atualizar turma
+router.delete("/turmas/:id", turmaController.Excluir);  // Excluir turma
+
+// Rotas para categorias
+router.post("/categorias", categoriaController.Inserir);
+router.get("/categorias", categoriaController.Listar);
+router.put("/categorias/:id", categoriaController.Editar);  // Atualizar categoria
+router.delete("/categorias/:id", categoriaController.Excluir);  // Excluir categoria
 
 export default router;

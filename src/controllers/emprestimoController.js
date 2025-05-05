@@ -1,5 +1,5 @@
 import db from "../db.js";
-import { validarFuncionario } from "../services.js";
+import { validarEmprestimo } from "../services.js";
 
 
 const emprestimoController = {

@@ -6,7 +6,7 @@ const alunoController = {
         const erro = validarAluno(req.body);
         if (erro) return res.status(400).json({ erro });
 
-        db.query("INSERT INTO alunos VALUES (?, ?, ?)", [req.body.matricula, req.body.nome, req.body.serie], (err) => {
+        db.query("INSERT INTO alunos VALUES (?, ?, ?)", [req.body.matricula, req.body.nome, req.body.turma], (err) => {
             res.json(err ? { erro: err.message } : { mensagem: "Aluno cadastrado" });
         });
     },
@@ -19,8 +19,8 @@ const alunoController = {
 
     Editar: (req, res) => {
         const { id } = req.params;
-        const { nome, serie } = req.body;
-        db.query("UPDATE alunos SET nome=?, serie=? WHERE matricula=?", [nome, serie, id], (err) => {
+        const { nome, turma } = req.body;
+        db.query("UPDATE alunos SET nome=?, turma=? WHERE matricula=?", [nome, turma, id], (err) => {        
             res.json(err ? { erro: err.message } : { mensagem: "Aluno atualizado" });
         });
     },
