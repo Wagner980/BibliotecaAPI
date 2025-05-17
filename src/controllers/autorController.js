@@ -1,40 +1,53 @@
-import db from "../db.js";
+import autorService from "../services/serviceAutor.js";
 
 
-const autorController = {
-    Inserir: (req, res) => {
-        const { nome } = req.body;
-        if (!nome) return res.status(400).json({ erro: "Nome do autor é obrigatório" });
+async function Listar(req, res) {
+  try {
+    const autores = await autorService.listar();
+    res.status(200).json(autores);
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+}
 
-        db.query("INSERT INTO autores (nome) VALUES (?)", [nome], (err, result) => {
-            if (err) return res.status(500).json({ erro: err.message });
-
-            const id = result.insertId; // Obtém o ID gerado pelo MySQL
-            res.json({ mensagem: "Autor cadastrado com sucesso", id, nome });
-        });
-    },
-
-    Listar: (req, res) => {
-        db.query("SELECT id, nome FROM autores", (err, rows) => {
-            res.json(err ? { erro: err.message } : rows);
-        });
-    },
-    Editar: (req, res) => {
-        const { id } = req.params;
-        const { nome } = req.body;
-        
-        db.query("UPDATE autores SET nome=? WHERE id=?", [nome, id], (err) => {
-            res.json(err ? { erro: err.message } : { mensagem: "Autor atualizado com sucesso" });
-        });
-    },
-
-    Excluir: (req, res) => {
-        const { id } = req.params;
-        
-        db.query("DELETE FROM autores WHERE id=?", [id], (err) => {
-            res.json(err ? { erro: err.message } : { mensagem: "Autor excluído com sucesso" });
-        });
+async function Inserir(req, res) {
+  try {
+    const { nome } = req.body;
+    if (!nome || nome.trim() === "") {
+      return res.status(400).json({ erro: "Nome do autor é obrigatório" });
     }
-};
+    
+    const autor = await autorService.inserir(nome);
+    res.status(201).json({ mensagem: "Autor cadastrado com sucesso", ...autor });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+}
 
-export default autorController;
+async function Editar(req, res) {
+  try {
+    const { id } = req.params;
+    const { nome } = req.body;
+    if (!nome || nome.trim() === "") {
+      return res.status(400).json({ erro: "Nome do autor é obrigatório" });
+    }
+    
+    await autorService.editar(id, nome);
+    res.status(200).json({ mensagem: "Autor atualizado com sucesso" });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+}
+
+async function Excluir(req, res) {
+  try {
+    const { id } = req.params;
+    
+    await autorService.excluir(id);
+    res.status(200).json({ mensagem: "Autor excluído com sucesso" });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+}
+
+export default { Listar, Inserir, Editar, Excluir };

@@ -3,12 +3,10 @@ import cors from "cors";
 import routes from "./routes.js";
 import dotenv from "dotenv";
 
-
-
 dotenv.config(); // Carrega variáveis do .env
 
-const app = express();
-app.use(express.json());
+const app = express();   // Inicializa o app
+app.use(express.json()); // Middleware para JSON
 app.use(cors());
 
 // Registrando rotas

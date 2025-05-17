@@ -1,36 +1,64 @@
-import db from "../db.js";
-import { validarAluno } from "../services.js";
+import alunoService from "../services/serviceAluno.js";
 
-const alunoController = {
-    Inserir: (req, res) => {
-        const erro = validarAluno(req.body);
-        if (erro) return res.status(400).json({ erro });
+export async function Listar(req, res) {
+  try {
+    const alunos = await alunoService.listar();
+    res.status(200).json({ alunos });
+  } catch (error) {
+    res.status(500).json({ erro: error.message });
+  }
+}
 
-        db.query("INSERT INTO alunos VALUES (?, ?, ?)", [req.body.matricula, req.body.nome, req.body.turma], (err) => {
-            res.json(err ? { erro: err.message } : { mensagem: "Aluno cadastrado" });
-        });
-    },
+export async function Inserir(req, res) {
+  try {
+    const erro = await alunoService.validar(req.body);
+    if (erro) return res.status(400).json({ erro });
 
-    Listar: (req, res) => {
-        db.query("SELECT * FROM alunos", (err, rows) => {
-            res.json(rows);
-        });
-    },
+    const { matricula, nome, turma } = req.body;
+    const novoAluno = await alunoService.inserir(matricula, nome, turma);
+    res.status(201).json({
+      mensagem: "Aluno cadastrado com sucesso",
+      aluno: novoAluno,
+    });
+  } catch (error) {
+    res.status(500).json({
+      erro: "Erro interno no servidor",
+      detalhes: error.message,
+    });
+  }
+}
 
-    Editar: (req, res) => {
-        const { id } = req.params;
-        const { nome, turma } = req.body;
-        db.query("UPDATE alunos SET nome=?, turma=? WHERE matricula=?", [nome, turma, id], (err) => {        
-            res.json(err ? { erro: err.message } : { mensagem: "Aluno atualizado" });
-        });
-    },
+export async function Editar(req, res) {
+  try {
+    const { matricula } = req.params;
+    const { nome, turma } = req.body;
+    const alunoAtualizado = await alunoService.editar(matricula, nome, turma);
+    res.status(200).json({
+      mensagem: "Aluno atualizado com sucesso",
+      aluno: alunoAtualizado,
+    });
+  } catch (error) {
+    res.status(500).json({
+      erro: "Erro interno no servidor",
+      detalhes: error.message,
+    });
+  }
+}
 
-    Excluir: (req, res) => {
-        const { id } = req.params;
-        db.query("DELETE FROM alunos WHERE matricula=?", [id], (err) => {
-            res.json(err ? { erro: err.message } : { mensagem: "Aluno excluído" });
-        });
-    }
-};
+export async function Excluir(req, res) {
+  try {
+    const { matricula } = req.params;
+    const resultado = await alunoService.excluir(matricula);
+    res.status(200).json({
+      mensagem: "Aluno excluído com sucesso",
+      resultado,
+    });
+  } catch (error) {
+    res.status(500).json({
+      erro: "Erro interno no servidor",
+      detalhes: error.message,
+    });
+  }
+}
 
-export default alunoController;
+export default { Listar, Inserir, Editar, Excluir };

@@ -1,46 +1,65 @@
-import db from "../db.js";
-import { validarFuncionario } from "../services.js";
+import funcionarioRepository from "../repositories/funcionarioRepository.js";
+import { validarFuncionario } from "../services/serviceFuncionario.js";
 
+// Insere um novo funcionário
+async function Inserir(req, res) {
+  try {
+    // Valida os dados do funcionário usando a função de validação
+    const erro = validarFuncionario(req.body);
+    if (erro) return res.status(400).json({ erro });
 
-const funcionarioController = {
-    Inserir: (req, res) => {
-        const erro = validarFuncionario(req.body);
-        if (erro) return res.status(400).json({ erro });
+    const { nome } = req.body;
+    // Chama o repositório para inserir o funcionário
+    const novoFuncionario = await funcionarioRepository.inserir(nome.trim());
+    res.status(201).json({
+      mensagem: "Funcionário cadastrado com sucesso",
+      ...novoFuncionario,
+    });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+}
 
-        db.query("INSERT INTO funcionarios (nome) VALUES (?)", [req.body.nome], (err, result) => {
-            if (err) return res.status(500).json({ erro: err.message });
-        
-            const id = result.insertId; // Obtém o ID gerado automaticamente pelo MySQL
-            res.json({ mensagem: "Funcionário cadastrado com sucesso", id, nome: req.body.nome });
-        });
-        
-    },
+// Lista todos os funcionários
+async function Listar(req, res) {
+  try {
+    const funcionarios = await funcionarioRepository.listar();
+    res.status(200).json(funcionarios);
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+}
 
-    Listar: (req, res) => {
-        db.query("SELECT * FROM funcionarios", (err, rows) => {
-            res.json(rows);
-        });
-    },
+// Edita um funcionário existente
+async function Editar(req, res) {
+  try {
+    const { id } = req.params;
+    const { nome } = req.body;
 
-    Editar: (req, res) => {
-        const { id } = req.params;
-        const { nome } = req.body;
-    
-        db.query("SELECT id FROM funcionarios WHERE id = ?", [id], (err, rows) => {
-            if (err || rows.length === 0) return res.status(404).json({ erro: "Funcionário não encontrado" });
-    
-            db.query("UPDATE funcionarios SET nome=? WHERE id=?", [nome, id], (err) => {
-                res.json(err ? { erro: err.message } : { mensagem: "Funcionário atualizado com sucesso" });
-            });
-        });
-    },
-    
-    Excluir: (req, res) => {
-        const { id } = req.params;
-        db.query("DELETE FROM funcionarios WHERE id=?", [id], (err) => {
-            res.json(err ? { erro: err.message } : { mensagem: "Funcionário excluído" });
-        });
+    // Verifica se o funcionário existe
+    const funcionarios = await funcionarioRepository.listar();
+    const funcionarioExiste = funcionarios.find((f) => f.id == id);
+    if (!funcionarioExiste) {
+      return res.status(404).json({ erro: "Funcionário não encontrado" });
     }
-};
 
-export default funcionarioController;
+    // Atualiza o funcionário com o novo nome
+    const resultado = await funcionarioRepository.editar(id, nome.trim());
+    res.status(200).json({ mensagem: "Funcionário atualizado com sucesso", resultado });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+}
+
+// Exclui um funcionário
+async function Excluir(req, res) {
+  try {
+    const { id } = req.params;
+    const resultado = await funcionarioRepository.excluir(id);
+    res.status(200).json({ mensagem: "Funcionário excluído com sucesso", resultado });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+}
+
+export default { Inserir, Listar, Editar, Excluir };
