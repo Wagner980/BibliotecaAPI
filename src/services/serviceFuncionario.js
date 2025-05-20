@@ -1,6 +1,9 @@
 export function validarFuncionario(funcionario) {
-  if (!funcionario.nome || funcionario.nome.trim() === "") {
-    return "Nome do funcionário é obrigatório";
+  if (!funcionario.email || funcionario.email.trim() === "") {
+    return "Email do funcionário é obrigatório";
+  }
+  if (!funcionario.senha || funcionario.senha.trim() === "") {
+    return "Senha do funcionário é obrigatória";
   }
   return null;
 }

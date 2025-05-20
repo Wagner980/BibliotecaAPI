@@ -5,6 +5,7 @@ import funcionarioController from "./controllers/funcionarioController.js";
 import emprestimoController from "./controllers/emprestimoController.js";
 import autorController from "./controllers/autorController.js";
 import categoriaController from "./controllers/categoriaController.js";
+import loginController from "./controllers/loginController.js";
 
 const router = Router();
 
@@ -49,5 +50,7 @@ router.post("/categorias", categoriaController.Inserir);
 router.get("/categorias", categoriaController.Listar);
 router.put("/categorias/:id", categoriaController.Editar);
 router.delete("/categorias/:id", categoriaController.Excluir);
+
+router.post("/login", loginController.login);
 
 export default router;
