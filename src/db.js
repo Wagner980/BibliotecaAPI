@@ -1,7 +1,9 @@
 import mysql from "mysql2";
 import dotenv from "dotenv";
 
-dotenv.config(); // Carrega variáveis do .env
+dotenv.config();
+console.log("MYSQL_HOST:", process.env.MYSQL_HOST);
+ 
 
 const db = mysql.createConnection({
     host: process.env.MYSQL_HOST,
